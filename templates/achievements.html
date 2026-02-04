@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% set title = "Achievements" %}
+{% block content %}
+<section class="card">
+  <h2>Achievements</h2>
+  <div class="grid-2">
+    {% for achievement in achievements %}
+      <div class="badge {{ 'earned' if achievement.id in earned_ids else 'locked' }}">
+        <h3>{{ achievement.name }}</h3>
+        <p>{{ achievement.description }}</p>
+        {% if achievement.id in earned_ids %}
+          <span class="tag">Oppnådd</span>
+        {% else %}
+          <span class="tag">Ikke oppnådd</span>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

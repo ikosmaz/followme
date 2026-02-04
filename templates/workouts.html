@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% set title = "Økter" %}
+{% block content %}
+<section class="split">
+  <div class="card">
+    <h2>Legg inn økt</h2>
+    <form method="post" action="{{ url_for('add_workout') }}" class="form">
+      <label>Dato
+        <input type="date" name="workout_date" value="{{ today }}" required>
+      </label>
+      <label>Type trening
+        <div class="radio-group" data-radio-group>
+          {% for activity in activity_types %}
+            <label class="radio-option {% if loop.first %}selected{% endif %}">
+              <input type="radio" name="activity_type" value="{{ activity.name }}" {% if loop.first %}checked{% endif %}>
+              <span><i class="fa-solid {{ activity.icon_class }}"></i> {{ activity.name }}</span>
+            </label>
+          {% endfor %}
+        </div>
+      </label>
+      <label>Antall km
+        <input type="number" name="km" step="0.1" min="0" required>
+      </label>
+      <button class="button" type="submit">Lagre økt</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Historikk</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Dato</th>
+          <th>Type</th>
+          <th>Km</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for workout in workouts %}
+          <tr>
+            <td>{{ workout.workout_date.strftime('%d.%m.%Y') }}</td>
+            <td><i class="fa-solid {{ activity_icons.get(workout.activity_type, 'fa-star') }}"></i> {{ workout.activity_type }}</td>
+            <td>{{ "%.1f"|format(workout.km) }}</td>
+            <td><a class="button secondary small" href="{{ url_for('edit_workout', workout_id=workout.id) }}">Redigere</a></td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="3" class="muted">Ingen økter registrert enda.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.querySelectorAll("[data-radio-group]").forEach((group) => {
+    group.addEventListener("change", (event) => {
+      if (event.target.name !== "activity_type") return;
+      group.querySelectorAll(".radio-option").forEach((opt) => opt.classList.remove("selected"));
+      const label = event.target.closest(".radio-option");
+      if (label) label.classList.add("selected");
+    });
+  });
+</script>
+{% endblock %}

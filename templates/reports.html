@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% set title = "Rapporter" %}
+{% block content %}
+<section class="grid">
+  <div class="card">
+    <h2>Fremgang</h2>
+    <ul class="list">
+      <li>Uke: {{ "%.1f"|format(km_week) }} km</li>
+      <li>Måned: {{ "%.1f"|format(km_month) }} km</li>
+      <li>År: {{ "%.1f"|format(km_year) }} km</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Achievements</h2>
+    <ul class="list">
+      {% for entry, achievement in earned %}
+        <li>{{ achievement.name }} ({{ entry.earned_at.strftime('%d.%m.%Y') }})</li>
+      {% else %}
+        <li class="muted">Ingen achievements enda.</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>High score</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Bruker</th>
+          <th>Km</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in leaderboard %}
+          <tr>
+            <td>{{ row.username }}</td>
+            <td>{{ "%.1f"|format(row.total_km) }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

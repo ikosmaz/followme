@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% set title = "Registrer" %}
+{% block content %}
+<div class="auth">
+  <h1>Registrer deg</h1>
+  <form method="post" class="form">
+    <label>Brukernavn
+      <input type="text" name="username" required>
+    </label>
+    <label>Hele navn
+      <input type="text" name="full_name" required>
+    </label>
+    <label>E-post
+      <input type="email" name="email" required>
+    </label>
+    <label>Passord
+      <input type="password" name="password" required>
+    </label>
+    <button class="button" type="submit">Opprett konto</button>
+    <p class="muted">Har du konto? <a href="{{ url_for('login') }}">Logg inn</a>.</p>
+  </form>
+</div>
+{% endblock %}

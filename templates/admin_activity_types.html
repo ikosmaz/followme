@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% set title = "Treningstyper" %}
+{% block content %}
+<section class="card">
+  <div class="card-header">
+    <h2>Treningstyper</h2>
+    <a class="button secondary" href="{{ url_for('admin_dashboard') }}">Tilbake til dashboard</a>
+  </div>
+  <form method="post" class="form">
+    <label>Navn
+      <input type="text" name="name" required>
+    </label>
+    <label>Font Awesome ikonklasse
+      <input type="text" name="icon_class" placeholder="fa-person-walking">
+    </label>
+    <button class="button" type="submit">Opprett treningstype</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Eksisterende treningstyper</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Ikon</th>
+        <th>Navn</th>
+        <th>Klasse</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for a in activity_types %}
+        <tr>
+          <td><i class="fa-solid {{ a.icon_class }}"></i></td>
+          <td>{{ a.name }}</td>
+          <td>{{ a.icon_class }}</td>
+          <td><a class="button secondary small" href="{{ url_for('admin_activity_type_edit', activity_id=a.id) }}">Redigere</a></td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="4" class="muted">Ingen treningstyper.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

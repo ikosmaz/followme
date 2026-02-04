@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% set title = "Rediger bruker" %}
+{% block content %}
+<section class="card">
+  <h2>Rediger bruker</h2>
+  <form method="post" class="form">
+    <label>Brukernavn
+      <input type="text" value="{{ edit_user.username }}" disabled>
+    </label>
+    <label>Hele navn
+      <input type="text" name="full_name" value="{{ edit_user.full_name }}" required>
+    </label>
+    <label>E-post
+      <input type="email" name="email" value="{{ edit_user.email }}" required>
+    </label>
+    <label>Rolle
+      <select name="role">
+        <option value="user" {% if edit_user.role == 'user' %}selected{% endif %}>user</option>
+        <option value="admin" {% if edit_user.role == 'admin' %}selected{% endif %}>admin</option>
+      </select>
+    </label>
+    <label>Grupper
+      <div class="check-group">
+        {% for group in groups %}
+          <label class="check-option">
+            <input type="checkbox" name="groups" value="{{ group.id }}" {% if group.id in user_group_ids %}checked{% endif %}>
+            <span>{{ group.name }}</span>
+          </label>
+        {% endfor %}
+      </div>
+    </label>
+    <div class="form-actions">
+      <button class="button" type="submit">Lagre</button>
+      <button class="button secondary" type="submit" form="delete-user">Slett</button>
+      <a class="button secondary" href="{{ url_for('admin_users') }}">Avbryt</a>
+    </div>
+  </form>
+  <form id="delete-user" method="post" action="{{ url_for('admin_user_delete', user_id=edit_user.id) }}"></form>
+</section>
+{% endblock %}

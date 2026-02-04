@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% set title = "Dashboard" %}
+{% block content %}
+<section class="hero">
+  <div>
+    <h1>Du er på nivå {{ level }} og har samlet {{ "%.1f"|format(total_km) }} km.</h1>
+    <p class="muted">Fortsett å logge økter for å låse opp flere destinasjoner og belønninger.</p>
+  </div>
+</section>
+
+<section class="grid">
+  <div class="card">
+    <h2>Din reise</h2>
+    <p class="muted">Nåværende destinasjon</p>
+    <h3>{{ current.name }}, {{ current.country }}</h3>
+    <p>{{ current.fact }}</p>
+    {% if next_dest %}
+      {% set progress = (total_km - current.distance_km) / (next_dest.distance_km - current.distance_km) * 100 %}
+      <div class="progress">
+        <div class="progress-bar" style="width: {{ progress|round(0) }}%"></div>
+      </div>
+      <p class="muted">Neste: {{ next_dest.name }} ({{ "%.0f"|format(next_dest.distance_km - total_km) }} km igjen)</p>
+    {% else %}
+      <p class="muted">Du har nådd alle destinasjoner!</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2>Opplåste steder</h2>
+    <ul class="list">
+      {% for dest in unlocked %}
+        <li>
+          <strong>{{ dest.name }}</strong> — {{ dest.country }}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Achievements</h2>
+    <p class="muted">Du har oppnådd {{ achievement_count }} merker.</p>
+    <a class="button" href="{{ url_for('achievements') }}">Se alle</a>
+  </div>
+</section>
+{% endblock %}

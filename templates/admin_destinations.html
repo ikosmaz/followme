@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% set title = "Destinasjoner" %}
+{% block content %}
+<section class="card">
+  <div class="card-header">
+    <h2>Destinasjoner</h2>
+    <a class="button secondary" href="{{ url_for('admin_dashboard') }}">Tilbake til dashboard</a>
+  </div>
+  <form method="post" class="form">
+    <label>Navn
+      <input type="text" name="name" required>
+    </label>
+    <label>Land
+      <input type="text" name="country" required>
+    </label>
+    <label>Distanse (km)
+      <input type="number" name="distance_km" step="0.1" min="0" required>
+    </label>
+    <label>Fakta
+      <input type="text" name="fact" required>
+    </label>
+    <label>Bilde-URL
+      <input type="url" name="image_url" required>
+    </label>
+    <button class="button" type="submit">Opprett destinasjon</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Eksisterende destinasjoner</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Navn</th>
+        <th>Land</th>
+        <th>Km</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in destinations %}
+        <tr>
+          <td>{{ d.name }}</td>
+          <td>{{ d.country }}</td>
+          <td>{{ "%.0f"|format(d.distance_km) }}</td>
+          <td><a class="button secondary small" href="{{ url_for('admin_destination_edit', dest_id=d.id) }}">Redigere</a></td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="4" class="muted">Ingen destinasjoner.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

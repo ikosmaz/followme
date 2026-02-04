@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% set title = "Logg inn" %}
+{% block content %}
+<div class="auth">
+  <h1>Logg inn</h1>
+  <form method="post" class="form">
+    <label>Brukernavn
+      <input type="text" name="username" required>
+    </label>
+    <label>Passord
+      <input type="password" name="password" required>
+    </label>
+    <button class="button" type="submit">Logg inn</button>
+    <p class="muted">Har du ikke konto? <a href="{{ url_for('register') }}">Registrer deg</a>.</p>
+  </form>
+</div>
+{% endblock %}

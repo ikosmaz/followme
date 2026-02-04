@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% set title = "Rediger gruppe" %}
+{% block content %}
+<section class="card">
+  <h2>Rediger gruppe</h2>
+  <form method="post" class="form">
+    <label>Gruppenavn
+      <input type="text" name="name" value="{{ group.name }}" required>
+    </label>
+    <label>Beskrivelse
+      <input type="text" name="description" value="{{ group.description }}">
+    </label>
+    <label>Rettigheter
+      <div class="check-group">
+        {% for perm in permissions %}
+          <label class="check-option">
+            <input type="checkbox" name="permissions" value="{{ perm.id }}" {% if perm.id in group_perm_ids %}checked{% endif %}>
+            <span>{{ perm.code }} — {{ perm.description }}</span>
+          </label>
+        {% endfor %}
+      </div>
+    </label>
+    <div class="form-actions">
+      <button class="button" type="submit">Lagre</button>
+      <button class="button secondary" type="submit" form="delete-group">Slett gruppe</button>
+      <a class="button secondary" href="{{ url_for('admin_groups') }}">Avbryt</a>
+    </div>
+  </form>
+  <form id="delete-group" method="post" action="{{ url_for('admin_group_delete', group_id=group.id) }}"></form>
+</section>
+{% endblock %}

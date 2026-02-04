@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% set title = "Profil" %}
+{% block content %}
+<section class="card">
+  <h2>Profil</h2>
+  <form method="post" class="form" enctype="multipart/form-data">
+    <label>Hele navn
+      <input type="text" name="full_name" value="{{ user.full_name }}" required>
+    </label>
+    <label>E-post
+      <input type="email" name="email" value="{{ user.email }}" required>
+    </label>
+    <label>Avatar-farge
+      <input type="color" name="avatar_color" value="{{ user.avatar_color }}" style="background-color: {{ user.avatar_color }};">
+    </label>
+    <label>Avatar-bilde
+      <input type="file" name="avatar_image" accept="image/*">
+    </label>
+    {% if user.avatar_image %}
+      <div class="avatar-preview">
+        <img src="{{ url_for('static', filename='uploads/' ~ user.avatar_image) }}" alt="Avatar">
+        <span class="muted">Bilde er valgt, tekst-ikon skjules.</span>
+        <button class="button secondary" type="submit" name="remove_avatar" value="1">Fjern bilde</button>
+      </div>
+    {% endif %}
+    <button class="button" type="submit">Oppdater profil</button>
+  </form>
+  <form method="post" action="{{ url_for('profile_delete') }}" class="form" onsubmit="return confirm('Er du sikker på at du vil slette kontoen?');">
+    <button class="button secondary" type="submit">Slett konto</button>
+  </form>
+</section>
+{% endblock %}

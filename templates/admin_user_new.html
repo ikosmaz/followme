@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% set title = "Ny bruker" %}
+{% block content %}
+<section class="card">
+  <h2>Opprett bruker</h2>
+  <form method="post" class="form">
+    <label>Brukernavn
+      <input type="text" name="username" required>
+    </label>
+    <label>Hele navn
+      <input type="text" name="full_name" required>
+    </label>
+    <label>E-post
+      <input type="email" name="email" required>
+    </label>
+    <label>Passord
+      <input type="password" name="password" required>
+    </label>
+    <label>Rolle
+      <select name="role">
+        <option value="user">user</option>
+        <option value="admin">admin</option>
+      </select>
+    </label>
+    <div class="form-actions">
+      <button class="button" type="submit">Opprett</button>
+      <a class="button secondary" href="{{ url_for('admin_users') }}">Avbryt</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

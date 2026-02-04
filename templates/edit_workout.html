@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% set title = "Rediger økt" %}
+{% block content %}
+<section class="card">
+  <h2>Rediger økt</h2>
+  <form method="post" class="form">
+    <label>Dato
+      <input type="date" name="workout_date" value="{{ workout.workout_date }}" required>
+    </label>
+    <label>Type trening
+      <div class="radio-group" data-radio-group>
+        {% for activity in activity_types %}
+          <label class="radio-option {% if workout.activity_type == activity.name %}selected{% endif %}">
+            <input type="radio" name="activity_type" value="{{ activity.name }}" {% if workout.activity_type == activity.name %}checked{% endif %}>
+            <span><i class="fa-solid {{ activity.icon_class }}"></i> {{ activity.name }}</span>
+          </label>
+        {% endfor %}
+      </div>
+    </label>
+    <label>Antall km
+      <input type="number" name="km" step="0.1" min="0" value="{{ "%.1f"|format(workout.km) }}" required>
+    </label>
+    <div class="form-actions">
+      <button class="button" type="submit">Lagre endringer</button>
+      <button class="button secondary" type="submit" form="delete-workout">Slett økt</button>
+      <a class="button secondary" href="{{ url_for('workouts') }}">Avbryt</a>
+    </div>
+  </form>
+  <form id="delete-workout" method="post" action="{{ url_for('delete_workout', workout_id=workout.id) }}"></form>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.querySelectorAll("[data-radio-group]").forEach((group) => {
+    group.addEventListener("change", (event) => {
+      if (event.target.name !== "activity_type") return;
+      group.querySelectorAll(".radio-option").forEach((opt) => opt.classList.remove("selected"));
+      const label = event.target.closest(".radio-option");
+      if (label) label.classList.add("selected");
+    });
+  });
+</script>
+{% endblock %}

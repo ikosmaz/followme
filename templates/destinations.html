@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% set title = "Destinasjoner" %}
+{% block content %}
+<section class="card">
+  <h2>Reisekart</h2>
+  <p class="muted">Du har samlet {{ "%.1f"|format(total_km) }} km totalt.</p>
+  <div class="destinations">
+    {% for dest in destinations %}
+      {% set unlocked = total_km >= dest.distance_km %}
+      <div class="destination {{ 'unlocked' if unlocked else 'locked' }}">
+        <img src="{{ dest.image_url }}" alt="{{ dest.name }}">
+        <div class="destination-body">
+          <h3>{{ dest.name }}, {{ dest.country }}</h3>
+          <p class="muted">{{ dest.distance_km }} km fra start</p>
+          {% if unlocked %}
+            <p>{{ dest.fact }}</p>
+          {% else %}
+            <p class="muted">Lås opp ved {{ dest.distance_km }} km.</p>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

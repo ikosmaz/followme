@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% set title = "Rediger treningstype" %}
+{% block content %}
+<section class="card">
+  <h2>Rediger treningstype</h2>
+  <form method="post" class="form">
+    <label>Navn
+      <input type="text" name="name" value="{{ activity.name }}" required>
+    </label>
+    <label>Font Awesome ikonklasse
+      <input type="text" name="icon_class" value="{{ activity.icon_class }}">
+    </label>
+    <div class="form-actions">
+      <button class="button" type="submit">Lagre</button>
+      <button class="button secondary" type="submit" form="delete-activity">Slett</button>
+      <a class="button secondary" href="{{ url_for('admin_activity_types') }}">Avbryt</a>
+    </div>
+  </form>
+  <form id="delete-activity" method="post" action="{{ url_for('admin_activity_type_delete', activity_id=activity.id) }}"></form>
+</section>
+{% endblock %}

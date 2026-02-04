@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% set title = "Admin dashboard" %}
+{% block content %}
+<section class="grid">
+  <div class="card">
+    <h2>Brukere</h2>
+    <p class="muted">Totalt: {{ user_count }}</p>
+    <a class="button" href="{{ url_for('admin_users') }}">Administrer brukere</a>
+  </div>
+  <div class="card">
+    <h2>Grupper</h2>
+    <p class="muted">Totalt: {{ group_count }}</p>
+    <a class="button" href="{{ url_for('admin_groups') }}">Administrer grupper</a>
+  </div>
+  <div class="card">
+    <h2>Rettigheter</h2>
+    <p class="muted">Totalt: {{ permission_count }}</p>
+    <a class="button" href="{{ url_for('admin_permissions') }}">Administrer rettigheter</a>
+  </div>
+  <div class="card">
+    <h2>Destinasjoner</h2>
+    <p class="muted">Totalt: {{ destination_count }}</p>
+    <a class="button" href="{{ url_for('admin_destinations') }}">Administrer destinasjoner</a>
+  </div>
+  <div class="card">
+    <h2>Treningstyper</h2>
+    <p class="muted">Totalt: {{ activity_count }}</p>
+    <a class="button" href="{{ url_for('admin_activity_types') }}">Administrer treningstyper</a>
+  </div>
+</section>
+{% endblock %}

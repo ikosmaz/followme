@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% set title = "Rediger rettighet" %}
+{% block content %}
+<section class="card">
+  <h2>Rediger rettighet</h2>
+  <form method="post" class="form">
+    <label>Kode
+      <input type="text" name="code" value="{{ permission.code }}" required>
+    </label>
+    <label>Beskrivelse
+      <input type="text" name="description" value="{{ permission.description }}">
+    </label>
+    <div class="form-actions">
+      <button class="button" type="submit">Lagre</button>
+      <button class="button secondary" type="submit" form="delete-permission">Slett</button>
+      <a class="button secondary" href="{{ url_for('admin_permissions') }}">Avbryt</a>
+    </div>
+  </form>
+  <form id="delete-permission" method="post" action="{{ url_for('admin_permission_delete', permission_id=permission.id) }}"></form>
+</section>
+{% endblock %}

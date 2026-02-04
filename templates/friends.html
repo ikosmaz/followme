@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% set title = "Venner" %}
+{% block content %}
+<section class="split">
+  <div class="card">
+    <h2>Legg til venn</h2>
+    <form method="post" class="form">
+      <label>Brukernavn
+        <input type="text" name="username" required>
+      </label>
+      <button class="button" type="submit">Legg til</button>
+    </form>
+
+    <h3>Venneliste</h3>
+    <ul class="list">
+      {% for friend in friends %}
+        <li class="friend-row">
+          <span>{{ friend.full_name }} (@{{ friend.username }})</span>
+          <form method="post" action="{{ url_for('delete_friend', friend_id=friend.id) }}" onsubmit="return confirm('Er du sikker på at du vil slette vennen?');">
+            <button class="button secondary small" type="submit">Slett</button>
+          </form>
+        </li>
+      {% else %}
+        <li class="muted">Ingen venner lagt til enda.</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>High score</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Bruker</th>
+          <th>Km</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in leaderboard %}
+          <tr>
+            <td>{{ row.username }}</td>
+            <td>{{ "%.1f"|format(row.total_km) }}</td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="2" class="muted">Ingen data.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title or "FollowMe" }}</title>
+  <link rel="icon" type="image/jpeg" href="{{ url_for('static', filename='img/logo.jpg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">FollowMe</div>
+      {% if user %}
+      <div class="nav-shell">
+        <input type="checkbox" id="nav-toggle" class="nav-toggle">
+        <label for="nav-toggle" class="hamburger" aria-label="Åpne meny">
+          <span></span>
+          <span></span>
+          <span></span>
+        </label>
+        <nav class="nav">
+          <a href="{{ url_for('index') }}"><i class="fa-solid fa-house"></i>&nbsp; Hjem</a>
+          <a href="{{ url_for('workouts') }}"><i class="fa-solid fa-dumbbell"></i>&nbsp; Økter</a>
+          <a href="{{ url_for('destinations') }}"><i class="fa-solid fa-earth-europe"></i>&nbsp; Destinasjoner</a>
+          <a href="{{ url_for('achievements') }}"><i class="fa-solid fa-trophy"></i>&nbsp; Achievements</a>
+          <a href="{{ url_for('friends') }}"><i class="fa-solid fa-user-group"></i> Venner</a>
+          <a href="{{ url_for('reports') }}"><i class="fa-solid fa-chart-line"></i>&nbsp; Rapporter</a>
+          <a class="mobile-only" href="{{ url_for('logout') }}"><i class="fa-solid fa-right-from-bracket"></i>&nbsp; Logg ut</a>
+          {% if user.role == 'admin' %}
+          <a href="{{ url_for('admin_dashboard') }}"><i class="fa-solid fa-shield-halved"></i>&nbsp; Admin</a>
+          {% endif %}
+          <div class="nav-avatar-wrap">
+            <a class="nav-avatar {% if user.avatar_image %}has-image{% endif %}" href="{{ url_for('profile') }}" style="--accent: {{ user.avatar_color }}" aria-label="Profil">
+              {% if user.avatar_image %}
+                <img src="{{ url_for('static', filename='uploads/' ~ user.avatar_image) }}" alt="Avatar">
+              {% else %}
+                {% set parts = user.full_name.split() %}
+                {% if parts|length == 1 %}
+                  <span>{{ parts[0][0]|upper }}</span>
+                {% else %}
+                  <span>{{ (parts[0][0] ~ parts[-1][0])|upper }}</span>
+                {% endif %}
+              {% endif %}
+            </a>
+            <div class="nav-welcome">Hei {{ user.full_name }}!</div>
+            <div class="nav-logout">
+              <a href="{{ url_for('logout') }}">Logg ut &nbsp;&nbsp; <i class="fa-solid fa-right-from-bracket"></i></a>
+            </div>
+          </div>
+        </nav>
+      </div>
+      {% else %}
+      <div class="nav-shell">
+        <input type="checkbox" id="nav-toggle" class="nav-toggle">
+        <label for="nav-toggle" class="hamburger" aria-label="Åpne meny">
+          <span></span>
+          <span></span>
+          <span></span>
+        </label>
+        <nav class="nav">
+          <a href="{{ url_for('login') }}">Logg inn</a>
+          <a href="{{ url_for('register') }}">Registrer</a>
+        </nav>
+      </div>
+      {% endif %}
+    </header>
+
+    <main class="main">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="flash">
+            {% for message in messages %}
+              <div class="flash-item">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+    </main>
+    <footer class="footer">
+      <div class="footer-inner">
+        <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="FEMVIS AS logo">
+        <p>Copyright © FEMVIS AS. Alle rettigheter forbeholdt.</p>
+      </div>
+    </footer>
+  </div>
+  <script>
+    (function () {
+      const wrap = document.querySelector(".nav-avatar-wrap");
+      if (!wrap) return;
+
+      const isMobile = () => window.matchMedia("(max-width: 860px)").matches;
+      const open = () => {
+        if (isMobile()) return;
+        wrap.classList.add("show-logout");
+      };
+      const close = () => wrap.classList.remove("show-logout");
+
+      wrap.addEventListener("mouseenter", open);
+      wrap.addEventListener("focusin", open);
+
+      document.addEventListener("click", (event) => {
+        if (!wrap.contains(event.target)) {
+          close();
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") close();
+      });
+    })();
+  </script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

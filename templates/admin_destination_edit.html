@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% set title = "Rediger destinasjon" %}
+{% block content %}
+<section class="card">
+  <h2>Rediger destinasjon</h2>
+  <form method="post" class="form">
+    <label>Navn
+      <input type="text" name="name" value="{{ destination.name }}" required>
+    </label>
+    <label>Land
+      <input type="text" name="country" value="{{ destination.country }}" required>
+    </label>
+    <label>Distanse (km)
+      <input type="number" name="distance_km" step="0.1" min="0" value="{{ destination.distance_km }}" required>
+    </label>
+    <label>Fakta
+      <input type="text" name="fact" value="{{ destination.fact }}" required>
+    </label>
+    <label>Bilde-URL
+      <input type="url" name="image_url" value="{{ destination.image_url }}" required>
+    </label>
+    <div class="form-actions">
+      <button class="button" type="submit">Lagre</button>
+      <button class="button secondary" type="submit" form="delete-destination">Slett</button>
+      <a class="button secondary" href="{{ url_for('admin_destinations') }}">Avbryt</a>
+    </div>
+  </form>
+  <form id="delete-destination" method="post" action="{{ url_for('admin_destination_delete', dest_id=destination.id) }}"></form>
+</section>
+{% endblock %}

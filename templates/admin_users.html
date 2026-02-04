@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% set title = "Admin" %}
+{% block content %}
+<section class="card">
+  <div class="card-header">
+    <h2>Brukere</h2>
+    <a class="button" href="{{ url_for('admin_user_new') }}">Ny bruker</a>
+  </div>
+  <div class="admin-links">
+    <a href="{{ url_for('admin_dashboard') }}">Til dashboard</a>
+    <a href="{{ url_for('admin_groups') }}">Grupper</a>
+    <a href="{{ url_for('admin_permissions') }}">Rettigheter</a>
+    <a href="{{ url_for('admin_destinations') }}">Destinasjoner</a>
+    <a href="{{ url_for('admin_activity_types') }}">Treningstyper</a>
+  </div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Brukernavn</th>
+        <th>Navn</th>
+        <th>E-post</th>
+        <th>Rolle</th>
+        <th>Registrert</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+        <tr>
+          <td>@{{ u.username }}</td>
+          <td>{{ u.full_name }}</td>
+          <td>{{ u.email }}</td>
+          <td>{{ u.role }}</td>
+          <td>{{ u.created_at.strftime('%d.%m.%Y') }}</td>
+          <td><a class="button secondary small" href="{{ url_for('admin_user_edit', user_id=u.id) }}">Redigere</a></td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}
