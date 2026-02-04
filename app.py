@@ -1,5 +1,6 @@
 from datetime import datetime, date
 from functools import wraps
+import os
 from pathlib import Path
 from uuid import uuid4
 
@@ -12,9 +13,9 @@ BASE_DIR = Path(__file__).resolve().parent
 DB_PATH = BASE_DIR / "followme.db"
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DB_PATH}"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", f"sqlite:///{DB_PATH}")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SECRET_KEY"] = "dev-secret-change-me"
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-change-me")
 app.config["UPLOAD_FOLDER"] = str(BASE_DIR / "static" / "uploads")
 
 db = SQLAlchemy(app)
