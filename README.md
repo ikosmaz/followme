@@ -39,6 +39,11 @@ python app.py
      gunicorn followme_app.app:app
      ```
 
+### Miljøvariabler (anbefalt)
+Legg til disse i Render → **Environment**:
+- `SECRET_KEY` = en lang tilfeldig streng
+- `DATABASE_URL` = valgfritt (brukes hvis du har ekstern DB)
+
 **Merk:** Gratis‑planen har begrensninger (idle sleep og ingen persistent disk). SQLite‑data kan gå tapt ved redeploy.
 
 ## Testdata
