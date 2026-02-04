@@ -586,6 +586,12 @@ input, select {
   .destination {
     grid-template-columns: 1fr;
   }
+  .destination img {
+    height: auto;
+  }
+  .destination-body {
+    padding-top: 12px;
+  }
   .hamburger {
     display: inline-flex;
   }
