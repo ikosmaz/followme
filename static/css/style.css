@@ -34,7 +34,7 @@ body {
   position: sticky;
   top: 0;
   backdrop-filter: blur(6px);
-  background: rgba(246, 242, 238, 0.8);
+  background: #e85b48;
   border-bottom: 1px solid var(--stroke);
   z-index: 10;
 }
@@ -380,7 +380,7 @@ input, select {
 }
 
 .radio-option:hover {
-  background: #2d7d46;
+  background: #e85b48;
   color: #fff;
 }
 
@@ -389,9 +389,9 @@ input, select {
 }
 
 .radio-option.selected {
-  background: #2d7d46;
+  background: #e85b48;
   color: #fff;
-  border-color: #2d7d46;
+  border-color: #e85b48;
 }
 
 .radio-option.selected i {
@@ -399,7 +399,7 @@ input, select {
 }
 
 .button {
-  background: var(--accent);
+  background: #e85b48;
   color: #fff;
   border: none;
   padding: 12px 18px;
@@ -412,7 +412,7 @@ input, select {
 }
 
 .button:hover {
-  background: #25683a;
+  background: #d94f3d;
 }
 
 .button.secondary {
