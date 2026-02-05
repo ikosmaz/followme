@@ -11,7 +11,8 @@
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <div class="brand">FollowMe</div>
+      <a href="{{ url_for('index') }}"><div class="brand">FollowMe</div></a>
+      
       {% if user %}
       <div class="nav-shell">
         <input type="checkbox" id="nav-toggle" class="nav-toggle">
@@ -22,7 +23,7 @@
         </label>
         <nav class="nav">
           <a href="{{ url_for('index') }}"><i class="fa-solid fa-house"></i>&nbsp; Hjem</a>
-          <a href="{{ url_for('workouts') }}"><i class="fa-solid fa-dumbbell"></i>&nbsp; Økter</a>
+          <a href="{{ url_for('workouts') }}"><i class="fa-solid fa-dumbbell"></i>&nbsp; Treningsøkter</a>
           <a href="{{ url_for('destinations') }}"><i class="fa-solid fa-earth-europe"></i>&nbsp; Destinasjoner</a>
           <a href="{{ url_for('achievements') }}"><i class="fa-solid fa-trophy"></i>&nbsp; Achievements</a>
           <a href="{{ url_for('friends') }}"><i class="fa-solid fa-user-group"></i> Venner</a>
