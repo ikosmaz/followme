@@ -43,7 +43,7 @@
           <td>{{ d.name }}</td>
           <td>{{ d.country }}</td>
           <td>{{ "%.0f"|format(d.distance_km) }}</td>
-          <td><a class="button secondary small" href="{{ url_for('admin_destination_edit', dest_id=d.id) }}">Redigere</a></td>
+          <td><a class="button secondary small" href="{{ url_for('admin_destination_edit', dest_id=d.id) }}">Oppdater</a></td>
         </tr>
       {% else %}
         <tr>
