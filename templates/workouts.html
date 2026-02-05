@@ -3,7 +3,7 @@
 {% block content %}
 <section class="split">
   <div class="card">
-    <h2>Legg inn økt</h2>
+    <h2>Legg inn treningsøkt</h2>
     <form method="post" action="{{ url_for('add_workout') }}" class="form">
       <label>Dato
         <input type="date" name="workout_date" value="{{ today }}" required>
@@ -21,7 +21,7 @@
       <label>Antall km
         <input type="number" name="km" step="0.1" min="0" required>
       </label>
-      <button class="button" type="submit">Lagre økt</button>
+      <button class="button" type="submit">Lagre</button>
     </form>
   </div>
 
@@ -42,7 +42,7 @@
             <td>{{ workout.workout_date.strftime('%d.%m.%Y') }}</td>
             <td><i class="fa-solid {{ activity_icons.get(workout.activity_type, 'fa-star') }}"></i> {{ workout.activity_type }}</td>
             <td>{{ "%.1f"|format(workout.km) }}</td>
-            <td><a class="button secondary small" href="{{ url_for('edit_workout', workout_id=workout.id) }}">Redigere</a></td>
+            <td><a class="button secondary small" href="{{ url_for('edit_workout', workout_id=workout.id) }}">Oppdater</a></td>
           </tr>
         {% else %}
           <tr>
