@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from functools import wraps
 import os
 from pathlib import Path
@@ -112,6 +112,7 @@ class Challenge(db.Model):
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=False)
     target_km = db.Column(db.Float, nullable=False)
+    activity_type = db.Column(db.String(30), nullable=True)
 
 
 class ChallengeMember(db.Model):
@@ -166,7 +167,39 @@ def user_workout_count(user_id):
 
 
 def calculate_level(total_km):
-    return int(total_km // 50) + 1
+    if total_km <= 10:
+        return 1
+    elif total_km <= 50:
+        return 2
+    elif total_km <= 100:
+        return 3
+    elif total_km <= 500:
+        return 4
+    elif total_km <= 1000:
+        return 5
+    elif total_km <= 5000:
+        return 6
+    else:
+        return int(total_km // 5000) + 6
+
+
+def next_level_target(total_km):
+    thresholds = [10, 50, 100, 500, 1000, 5000]
+    for threshold in thresholds:
+        if total_km < threshold:
+            return threshold
+    return (int(total_km // 5000) + 1) * 5000
+
+
+def sum_km_between(user_id, start_date, end_date, activity_type=None):
+    query = db.session.query(db.func.coalesce(db.func.sum(Workout.km), 0)).filter(
+        Workout.user_id == user_id,
+        Workout.workout_date >= start_date,
+        Workout.workout_date <= end_date,
+    )
+    if activity_type:
+        query = query.filter(Workout.activity_type == activity_type)
+    return float(query.scalar() or 0)
 
 
 def allowed_file(filename):
@@ -266,21 +299,39 @@ def seed_data():
         )
 
     if Challenge.query.count() == 0:
+        today = date.today()
+        weekday = today.weekday()
+        if weekday <= 4:
+            next_friday = today + timedelta(days=(4 - weekday))
+        else:
+            next_friday = today + timedelta(days=(7 - weekday + 4))
+        next_sunday = next_friday + timedelta(days=2)
+        month_start = date(today.year, today.month, 1)
+        next_month = date(today.year + 1, 1, 1) if today.month == 12 else date(today.year, today.month + 1, 1)
+        month_end = next_month - timedelta(days=1)
         db.session.add_all(
             [
                 Challenge(
                     name="Helgeboost",
-                    description="Samle 20 km i helgen.",
-                    start_date=date.today(),
-                    end_date=date.today(),
+                    description="Samle 20 km i neste helg (fre–søn).",
+                    start_date=next_friday,
+                    end_date=next_sunday,
                     target_km=20,
                 ),
                 Challenge(
-                    name="Vintermoro",
+                    name="Månedens eventyr",
                     description="Gå på ski 30 km denne måneden.",
-                    start_date=date.today(),
-                    end_date=date.today(),
+                    start_date=month_start,
+                    end_date=month_end,
                     target_km=30,
+                    activity_type="Ski",
+                ),
+                Challenge(
+                    name="Sprint 10",
+                    description="Samle 10 km på 3 dager.",
+                    start_date=today,
+                    end_date=today + timedelta(days=2),
+                    target_km=10,
                 ),
             ]
         )
@@ -290,8 +341,9 @@ def seed_data():
             [
                 ActivityType(name="Gå", icon_class="fa-person-walking"),
                 ActivityType(name="Jogge", icon_class="fa-person-running"),
-                ActivityType(name="Sykle", icon_class="fa-bicycle"),
+                ActivityType(name="Sykle", icon_class="fa-person-biking"),
                 ActivityType(name="Ski", icon_class="fa-person-skiing"),
+                ActivityType(name="Svømme", icon_class="fa-person-swimming"),
                 ActivityType(name="Annet", icon_class="fa-star"),
             ]
         )
@@ -322,6 +374,8 @@ def index():
     user = get_current_user()
     total_km = user_total_km(user.id)
     level = calculate_level(total_km)
+    next_level_km = next_level_target(total_km)
+    km_to_next_level = max(0, next_level_km - total_km)
 
     destinations = Destination.query.order_by(Destination.distance_km).all()
     current = destinations[0]
@@ -338,6 +392,33 @@ def index():
     ensure_achievements(user.id)
     achievement_count = UserAchievement.query.filter_by(user_id=user.id).count()
 
+    today = date.today()
+    active_challenges = (
+        Challenge.query.filter(Challenge.start_date <= today, Challenge.end_date >= today)
+        .order_by(Challenge.end_date.asc())
+        .all()
+    )
+    member_ids = {
+        cm.challenge_id for cm in ChallengeMember.query.filter_by(user_id=user.id).all()
+    }
+    challenge_cards = []
+    for ch in active_challenges:
+        joined = ch.id in member_ids
+        progress_km = (
+            sum_km_between(user.id, ch.start_date, ch.end_date, ch.activity_type)
+            if joined
+            else 0.0
+        )
+        percent = min(100, int((progress_km / ch.target_km) * 100)) if ch.target_km > 0 else 0
+        challenge_cards.append(
+            {
+                "challenge": ch,
+                "joined": joined,
+                "progress_km": progress_km,
+                "percent": percent,
+            }
+        )
+
     return render_template(
         "dashboard.html",
         user=user,
@@ -347,6 +428,8 @@ def index():
         next_dest=next_dest,
         unlocked=unlocked,
         achievement_count=achievement_count,
+        challenges=challenge_cards,
+        km_to_next_level=km_to_next_level,
     )
 
 
@@ -569,17 +652,9 @@ def reports():
     month_start = date(today.year, today.month, 1)
     week_start = date.fromordinal(today.toordinal() - today.weekday())
 
-    def sum_between(start_date, end_date=None):
-        query = db.session.query(db.func.coalesce(db.func.sum(Workout.km), 0)).filter(
-            Workout.user_id == user.id, Workout.workout_date >= start_date
-        )
-        if end_date:
-            query = query.filter(Workout.workout_date <= end_date)
-        return float(query.scalar() or 0)
-
-    km_week = sum_between(week_start)
-    km_month = sum_between(month_start)
-    km_year = sum_between(year_start)
+    km_week = sum_km_between(user.id, week_start, today)
+    km_month = sum_km_between(user.id, month_start, today)
+    km_year = sum_km_between(user.id, year_start, today)
 
     ensure_achievements(user.id)
     earned = (
@@ -656,6 +731,70 @@ def profile_delete():
     return redirect(url_for("login"))
 
 
+@app.route("/challenges")
+@login_required
+def challenges():
+    user = get_current_user()
+    today = date.today()
+    challenges = Challenge.query.order_by(Challenge.start_date.desc()).all()
+    member_ids = {
+        cm.challenge_id for cm in ChallengeMember.query.filter_by(user_id=user.id).all()
+    }
+    rows = []
+    for ch in challenges:
+        if today < ch.start_date:
+            status = "upcoming"
+        elif today > ch.end_date:
+            status = "ended"
+        else:
+            status = "active"
+        joined = ch.id in member_ids
+        progress_km = (
+            sum_km_between(user.id, ch.start_date, ch.end_date, ch.activity_type)
+            if joined
+            else 0.0
+        )
+        percent = min(100, int((progress_km / ch.target_km) * 100)) if ch.target_km > 0 else 0
+        rows.append(
+            {
+                "challenge": ch,
+                "status": status,
+                "joined": joined,
+                "progress_km": progress_km,
+                "percent": percent,
+            }
+        )
+    return render_template("challenges.html", user=user, challenges=rows)
+
+
+@app.route("/challenges/<int:challenge_id>/join", methods=["POST"])
+@login_required
+def join_challenge(challenge_id):
+    user = get_current_user()
+    challenge = db.session.get(Challenge, challenge_id)
+    if not challenge:
+        flash("Fant ikke challenge.")
+        return redirect(request.form.get("next") or request.referrer or url_for("challenges"))
+    existing = ChallengeMember.query.filter_by(challenge_id=challenge_id, user_id=user.id).first()
+    if not existing:
+        db.session.add(ChallengeMember(challenge_id=challenge_id, user_id=user.id))
+        db.session.commit()
+        flash("Du er med i challengen!")
+    return redirect(request.form.get("next") or request.referrer or url_for("challenges"))
+
+
+@app.route("/challenges/<int:challenge_id>/leave", methods=["POST"])
+@login_required
+def leave_challenge(challenge_id):
+    user = get_current_user()
+    link = ChallengeMember.query.filter_by(challenge_id=challenge_id, user_id=user.id).first()
+    if link:
+        db.session.delete(link)
+        db.session.commit()
+        flash("Du har meldt deg av challengen.")
+    return redirect(request.form.get("next") or request.referrer or url_for("challenges"))
+
+
 @app.route("/admin/users")
 @login_required
 def admin_users():
@@ -679,6 +818,8 @@ def admin_dashboard():
     permission_count = Permission.query.count()
     destination_count = Destination.query.count()
     activity_count = ActivityType.query.count()
+    challenge_count = Challenge.query.count()
+    achievement_count = Achievement.query.count()
     return render_template(
         "admin_dashboard.html",
         user=admin,
@@ -687,6 +828,8 @@ def admin_dashboard():
         permission_count=permission_count,
         destination_count=destination_count,
         activity_count=activity_count,
+        challenge_count=challenge_count,
+        achievement_count=achievement_count,
     )
 
 
@@ -1079,6 +1222,185 @@ def admin_activity_type_delete(activity_id):
     db.session.commit()
     flash("Treningstype slettet.")
     return redirect(url_for("admin_activity_types"))
+
+
+@app.route("/admin/challenges", methods=["GET", "POST"])
+@login_required
+def admin_challenges():
+    admin = get_current_user()
+    if admin.role != "admin":
+        flash("Du har ikke tilgang.")
+        return redirect(url_for("index"))
+
+    activity_types = ActivityType.query.order_by(ActivityType.name.asc()).all()
+    if request.method == "POST":
+        name = request.form["name"].strip()
+        description = request.form["description"].strip()
+        start_date = datetime.strptime(request.form["start_date"], "%Y-%m-%d").date()
+        end_date = datetime.strptime(request.form["end_date"], "%Y-%m-%d").date()
+        target_km = float(request.form["target_km"])
+        activity_type = request.form.get("activity_type") or None
+
+        db.session.add(
+            Challenge(
+                name=name,
+                description=description,
+                start_date=start_date,
+                end_date=end_date,
+                target_km=target_km,
+                activity_type=activity_type,
+            )
+        )
+        db.session.commit()
+        flash("Challenge opprettet.")
+        return redirect(url_for("admin_challenges"))
+
+    challenges = Challenge.query.order_by(Challenge.start_date.desc()).all()
+    return render_template(
+        "admin_challenges.html",
+        user=admin,
+        challenges=challenges,
+        activity_types=activity_types,
+    )
+
+
+@app.route("/admin/challenges/<int:challenge_id>/edit", methods=["GET", "POST"])
+@login_required
+def admin_challenge_edit(challenge_id):
+    admin = get_current_user()
+    if admin.role != "admin":
+        flash("Du har ikke tilgang.")
+        return redirect(url_for("index"))
+
+    challenge = db.session.get(Challenge, challenge_id)
+    if not challenge:
+        flash("Fant ikke challenge.")
+        return redirect(url_for("admin_challenges"))
+
+    activity_types = ActivityType.query.order_by(ActivityType.name.asc()).all()
+    if request.method == "POST":
+        challenge.name = request.form["name"].strip()
+        challenge.description = request.form["description"].strip()
+        challenge.start_date = datetime.strptime(request.form["start_date"], "%Y-%m-%d").date()
+        challenge.end_date = datetime.strptime(request.form["end_date"], "%Y-%m-%d").date()
+        challenge.target_km = float(request.form["target_km"])
+        challenge.activity_type = request.form.get("activity_type") or None
+        db.session.commit()
+        flash("Challenge oppdatert.")
+        return redirect(url_for("admin_challenges"))
+
+    return render_template(
+        "admin_challenge_edit.html",
+        user=admin,
+        challenge=challenge,
+        activity_types=activity_types,
+    )
+
+
+@app.route("/admin/challenges/<int:challenge_id>/delete", methods=["POST"])
+@login_required
+def admin_challenge_delete(challenge_id):
+    admin = get_current_user()
+    if admin.role != "admin":
+        flash("Du har ikke tilgang.")
+        return redirect(url_for("index"))
+
+    challenge = db.session.get(Challenge, challenge_id)
+    if not challenge:
+        flash("Fant ikke challenge.")
+        return redirect(url_for("admin_challenges"))
+
+    ChallengeMember.query.filter_by(challenge_id=challenge.id).delete()
+    db.session.delete(challenge)
+    db.session.commit()
+    flash("Challenge slettet.")
+    return redirect(url_for("admin_challenges"))
+
+
+@app.route("/admin/achievements", methods=["GET", "POST"])
+@login_required
+def admin_achievements():
+    admin = get_current_user()
+    if admin.role != "admin":
+        flash("Du har ikke tilgang.")
+        return redirect(url_for("index"))
+
+    if request.method == "POST":
+        code = request.form["code"].strip()
+        name = request.form["name"].strip()
+        description = request.form["description"].strip()
+        rule_type = request.form["rule_type"].strip()
+        threshold = float(request.form["threshold"])
+
+        if Achievement.query.filter_by(code=code).first():
+            flash("Achievement-kode finnes allerede.")
+            return redirect(url_for("admin_achievements"))
+
+        db.session.add(
+            Achievement(
+                code=code,
+                name=name,
+                description=description,
+                rule_type=rule_type,
+                threshold=threshold,
+            )
+        )
+        db.session.commit()
+        flash("Achievement opprettet.")
+        return redirect(url_for("admin_achievements"))
+
+    achievements = Achievement.query.order_by(Achievement.id.desc()).all()
+    return render_template(
+        "admin_achievements.html", user=admin, achievements=achievements
+    )
+
+
+@app.route("/admin/achievements/<int:achievement_id>/edit", methods=["GET", "POST"])
+@login_required
+def admin_achievement_edit(achievement_id):
+    admin = get_current_user()
+    if admin.role != "admin":
+        flash("Du har ikke tilgang.")
+        return redirect(url_for("index"))
+
+    achievement = db.session.get(Achievement, achievement_id)
+    if not achievement:
+        flash("Fant ikke achievement.")
+        return redirect(url_for("admin_achievements"))
+
+    if request.method == "POST":
+        achievement.code = request.form["code"].strip()
+        achievement.name = request.form["name"].strip()
+        achievement.description = request.form["description"].strip()
+        achievement.rule_type = request.form["rule_type"].strip()
+        achievement.threshold = float(request.form["threshold"])
+        db.session.commit()
+        flash("Achievement oppdatert.")
+        return redirect(url_for("admin_achievements"))
+
+    return render_template(
+        "admin_achievement_edit.html", user=admin, achievement=achievement
+    )
+
+
+@app.route("/admin/achievements/<int:achievement_id>/delete", methods=["POST"])
+@login_required
+def admin_achievement_delete(achievement_id):
+    admin = get_current_user()
+    if admin.role != "admin":
+        flash("Du har ikke tilgang.")
+        return redirect(url_for("index"))
+
+    achievement = db.session.get(Achievement, achievement_id)
+    if not achievement:
+        flash("Fant ikke achievement.")
+        return redirect(url_for("admin_achievements"))
+
+    UserAchievement.query.filter_by(achievement_id=achievement.id).delete()
+    db.session.delete(achievement)
+    db.session.commit()
+    flash("Achievement slettet.")
+    return redirect(url_for("admin_achievements"))
 
 
 def init_db():
