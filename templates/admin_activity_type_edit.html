@@ -13,7 +13,7 @@
     <div class="form-actions">
       <button class="button" type="submit">Lagre</button>
       <button class="button secondary" type="submit" form="delete-activity">Slett</button>
-      <a class="button secondary" href="{{ url_for('admin_activity_types') }}">Avbryt</a>
+      <a class="button secondary small" href="{{ url_for('admin_activity_types') }}">Avbryt</a>
     </div>
   </form>
   <form id="delete-activity" method="post" action="{{ url_for('admin_activity_type_delete', activity_id=activity.id) }}"></form>
