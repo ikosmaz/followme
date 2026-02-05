@@ -22,15 +22,16 @@
           <span></span>
         </label>
         <nav class="nav">
-          <a href="{{ url_for('index') }}"><i class="fa-solid fa-house"></i>&nbsp; Hjem</a>
-          <a href="{{ url_for('workouts') }}"><i class="fa-solid fa-dumbbell"></i>&nbsp; Treningsøkter</a>
-          <a href="{{ url_for('destinations') }}"><i class="fa-solid fa-earth-europe"></i>&nbsp; Destinasjoner</a>
-          <a href="{{ url_for('achievements') }}"><i class="fa-solid fa-trophy"></i>&nbsp; Achievements</a>
-          <a href="{{ url_for('friends') }}"><i class="fa-solid fa-user-group"></i> Venner</a>
-          <a href="{{ url_for('reports') }}"><i class="fa-solid fa-chart-line"></i>&nbsp; Rapporter</a>
-          <a class="mobile-only" href="{{ url_for('logout') }}"><i class="fa-solid fa-right-from-bracket"></i>&nbsp; Logg ut</a>
+          <a href="{{ url_for('index') }}" class="{% if request.path == url_for('index') %}active{% endif %}"><i class="fa-solid fa-house"></i>&nbsp; Hjem</a>
+          <a href="{{ url_for('workouts') }}" class="{% if request.path.startswith(url_for('workouts')) %}active{% endif %}"><i class="fa-solid fa-dumbbell"></i>&nbsp; Treningsøkter</a>
+          <a href="{{ url_for('destinations') }}" class="{% if request.path.startswith(url_for('destinations')) %}active{% endif %}"><i class="fa-solid fa-earth-europe"></i>&nbsp; Destinasjoner</a>
+          <a href="{{ url_for('achievements') }}" class="{% if request.path.startswith(url_for('achievements')) %}active{% endif %}"><i class="fa-solid fa-trophy"></i>&nbsp; Achievements</a>
+          <a href="{{ url_for('friends') }}" class="{% if request.path.startswith(url_for('friends')) %}active{% endif %}"><i class="fa-solid fa-user-group"></i> Venner</a>
+          <a href="{{ url_for('reports') }}" class="{% if request.path.startswith(url_for('reports')) %}active{% endif %}"><i class="fa-solid fa-chart-line"></i>&nbsp; Rapporter</a>
+          <a href="{{ url_for('challenges') }}" class="{% if request.path.startswith(url_for('challenges')) %}active{% endif %}"><i class="fa-solid fa-flag-checkered"></i>&nbsp; Challenges</a>
+          <a class="mobile-only {% if request.path == url_for('logout') %}active{% endif %}" href="{{ url_for('logout') }}"><i class="fa-solid fa-right-from-bracket"></i>&nbsp; Logg ut</a>
           {% if user.role == 'admin' %}
-          <a href="{{ url_for('admin_dashboard') }}"><i class="fa-solid fa-shield-halved"></i>&nbsp; Admin</a>
+          <a href="{{ url_for('admin_dashboard') }}" class="{% if request.path.startswith('/admin') %}active{% endif %}"><i class="fa-solid fa-shield-halved"></i>&nbsp; Admin</a>
           {% endif %}
           <div class="nav-avatar-wrap">
             <a class="nav-avatar {% if user.avatar_image %}has-image{% endif %}" href="{{ url_for('profile') }}" style="--accent: {{ user.avatar_color }}" aria-label="Profil">
@@ -61,8 +62,8 @@
           <span></span>
         </label>
         <nav class="nav">
-          <a href="{{ url_for('login') }}">Logg inn</a>
-          <a href="{{ url_for('register') }}">Registrer</a>
+          <a href="{{ url_for('login') }}" class="{% if request.path.startswith(url_for('login')) %}active{% endif %}">Logg inn</a>
+          <a href="{{ url_for('register') }}" class="{% if request.path.startswith(url_for('register')) %}active{% endif %}">Registrer</a>
         </nav>
       </div>
       {% endif %}

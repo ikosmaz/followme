@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% set title = "Oppdater challenge" %}
+{% block content %}
+<section class="card">
+  <h2>Oppdater challenge</h2>
+  <form method="post" class="form">
+    <label>Navn
+      <input type="text" name="name" value="{{ challenge.name }}" required>
+    </label>
+    <label>Beskrivelse
+      <input type="text" name="description" value="{{ challenge.description }}" required>
+    </label>
+    <label>Startdato
+      <input type="date" name="start_date" value="{{ challenge.start_date }}" required>
+    </label>
+    <label>Sluttdato
+      <input type="date" name="end_date" value="{{ challenge.end_date }}" required>
+    </label>
+    <label>Mål (km)
+      <input type="number" name="target_km" step="0.1" min="0" value="{{ challenge.target_km }}" required>
+    </label>
+    <label>Treningstype (valgfritt)
+      <select name="activity_type">
+        <option value="" {% if not challenge.activity_type %}selected{% endif %}>Alle typer</option>
+        {% for a in activity_types %}
+          <option value="{{ a.name }}" {% if challenge.activity_type == a.name %}selected{% endif %}>{{ a.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <div class="form-actions">
+      <button class="button" type="submit">Lagre</button>
+      <button class="button secondary" type="submit" form="delete-challenge">Slett</button>
+      <a class="button secondary small" href="{{ url_for('admin_challenges') }}">Avbryt</a>
+    </div>
+  </form>
+  <form id="delete-challenge" method="post" action="{{ url_for('admin_challenge_delete', challenge_id=challenge.id) }}"></form>
+</section>
+{% endblock %}

@@ -27,5 +27,15 @@
     <p class="muted">Totalt: {{ activity_count }}</p>
     <a class="button" href="{{ url_for('admin_activity_types') }}">Administrer</a>
   </div>
+  <div class="card">
+    <h2>Challenges</h2>
+    <p class="muted">Totalt: {{ challenge_count }}</p>
+    <a class="button" href="{{ url_for('admin_challenges') }}">Administrer</a>
+  </div>
+  <div class="card">
+    <h2>Achievements</h2>
+    <p class="muted">Totalt: {{ achievement_count }}</p>
+    <a class="button" href="{{ url_for('admin_achievements') }}">Administrer</a>
+  </div>
 </section>
 {% endblock %}

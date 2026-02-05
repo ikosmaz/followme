@@ -5,10 +5,47 @@
   <div>
     <h1>Du er på nivå {{ level }} og har samlet {{ "%.1f"|format(total_km) }} km.</h1>
     <p class="muted">Fortsett å logge økter for å låse opp flere destinasjoner og belønninger.</p>
+    <p class="muted">{{ "%.1f"|format(km_to_next_level) }} km igjen til neste nivå.</p>
   </div>
 </section>
 
 <section class="grid">
+  <div class="card">
+    <h2>Challenges</h2>
+    {% if challenges %}
+      <div class="challenge-grid">
+        {% for item in challenges %}
+          <div class="challenge-tile">
+            <strong>{{ item.challenge.name }}</strong>
+            <p class="muted">{{ item.challenge.description }}</p>
+            <p class="muted">Periode: {{ item.challenge.start_date.strftime('%d.%m.%Y') }} – {{ item.challenge.end_date.strftime('%d.%m.%Y') }}</p>
+            <div class="progress">
+              <div class="progress-bar" style="width: {{ item.percent }}%"></div>
+            </div>
+            <p class="muted">{{ "%.1f"|format(item.progress_km) }} / {{ "%.1f"|format(item.challenge.target_km) }} km</p>
+            {% if item.challenge.activity_type %}
+              <p class="muted">Type: {{ item.challenge.activity_type }}</p>
+            {% endif %}
+            {% if item.joined %}
+              <form method="post" action="{{ url_for('leave_challenge', challenge_id=item.challenge.id) }}">
+                <input type="hidden" name="next" value="{{ url_for('index') }}">
+                <button class="button secondary small" type="submit">Meld av</button>
+              </form>
+            {% else %}
+              <form method="post" action="{{ url_for('join_challenge', challenge_id=item.challenge.id) }}">
+                <input type="hidden" name="next" value="{{ url_for('index') }}">
+                <button class="button" type="submit">Bli med</button>
+              </form>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+      <a class="button secondary small" href="{{ url_for('challenges') }}">Se alle challenges</a>
+    {% else %}
+      <p class="muted">Ingen aktive challenges akkurat nå.</p>
+      <a class="button secondary small" href="{{ url_for('challenges') }}">Se alle</a>
+    {% endif %}
+  </div>
   <div class="card">
     <h2>Din reise</h2>
     <p class="muted">Nåværende destinasjon</p>

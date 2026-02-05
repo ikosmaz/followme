@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% set title = "Achievements" %}
+{% block content %}
+<section class="card">
+  <div class="card-header">
+    <h2>Achievements</h2>
+    <a class="button secondary" href="{{ url_for('admin_dashboard') }}">Tilbake til dashboard</a>
+  </div>
+  <form method="post" class="form">
+    <label>Kode (unik)
+      <input type="text" name="code" required>
+    </label>
+    <label>Navn
+      <input type="text" name="name" required>
+    </label>
+    <label>Beskrivelse
+      <input type="text" name="description" required>
+    </label>
+    <label>Regel
+      <select name="rule_type">
+        <option value="total_km">Total km</option>
+        <option value="workouts">Antall økter</option>
+      </select>
+    </label>
+    <label>Grense (threshold)
+      <input type="number" name="threshold" step="1" min="1" required>
+    </label>
+    <button class="button" type="submit">Opprett achievement</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Eksisterende achievements</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Kode</th>
+        <th>Navn</th>
+        <th>Regel</th>
+        <th>Grense</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for a in achievements %}
+        <tr>
+          <td>{{ a.code }}</td>
+          <td>{{ a.name }}</td>
+          <td>{{ a.rule_type }}</td>
+          <td>{{ a.threshold }}</td>
+          <td><a class="button secondary small" href="{{ url_for('admin_achievement_edit', achievement_id=a.id) }}">Oppdater</a></td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="5" class="muted">Ingen achievements.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

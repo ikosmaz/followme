@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% set title = "Challenges" %}
+{% block content %}
+<section class="card">
+  <h2>Challenges</h2>
+  <p class="muted">Bli med på utfordringer for ekstra motivasjon og belønning.</p>
+</section>
+
+<section class="grid">
+  {% for row in challenges %}
+    {% set ch = row.challenge %}
+    <div class="card challenge-card">
+      <div class="challenge-header">
+        <h3>{{ ch.name }}</h3>
+        <span class="challenge-status {{ row.status }}">{{ row.status }}</span>
+      </div>
+      <p class="muted">{{ ch.description }}</p>
+      <p class="muted">Periode: {{ ch.start_date.strftime('%d.%m.%Y') }} – {{ ch.end_date.strftime('%d.%m.%Y') }}</p>
+      {% if ch.activity_type %}
+        <p class="muted">Type: {{ ch.activity_type }}</p>
+      {% endif %}
+      <div class="progress">
+        <div class="progress-bar" style="width: {{ row.percent }}%"></div>
+      </div>
+      <p class="muted">{{ "%.1f"|format(row.progress_km) }} / {{ "%.1f"|format(ch.target_km) }} km</p>
+      {% if row.joined %}
+        <form method="post" action="{{ url_for('leave_challenge', challenge_id=ch.id) }}">
+          <button class="button secondary small" type="submit">Meld av</button>
+        </form>
+      {% else %}
+        <form method="post" action="{{ url_for('join_challenge', challenge_id=ch.id) }}">
+          <button class="button" type="submit">Bli med</button>
+        </form>
+      {% endif %}
+    </div>
+  {% else %}
+    <div class="card">
+      <p class="muted">Ingen challenges ennå.</p>
+    </div>
+  {% endfor %}
+</section>
+{% endblock %}

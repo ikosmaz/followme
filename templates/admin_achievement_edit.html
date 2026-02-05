@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% set title = "Oppdater achievement" %}
+{% block content %}
+<section class="card">
+  <h2>Oppdater achievement</h2>
+  <form method="post" class="form">
+    <label>Kode (unik)
+      <input type="text" name="code" value="{{ achievement.code }}" required>
+    </label>
+    <label>Navn
+      <input type="text" name="name" value="{{ achievement.name }}" required>
+    </label>
+    <label>Beskrivelse
+      <input type="text" name="description" value="{{ achievement.description }}" required>
+    </label>
+    <label>Regel
+      <select name="rule_type">
+        <option value="total_km" {% if achievement.rule_type == 'total_km' %}selected{% endif %}>Total km</option>
+        <option value="workouts" {% if achievement.rule_type == 'workouts' %}selected{% endif %}>Antall økter</option>
+      </select>
+    </label>
+    <label>Grense (threshold)
+      <input type="number" name="threshold" step="1" min="1" value="{{ achievement.threshold }}" required>
+    </label>
+    <div class="form-actions">
+      <button class="button" type="submit">Lagre</button>
+      <button class="button secondary" type="submit" form="delete-achievement">Slett</button>
+      <a class="button secondary small" href="{{ url_for('admin_achievements') }}">Avbryt</a>
+    </div>
+  </form>
+  <form id="delete-achievement" method="post" action="{{ url_for('admin_achievement_delete', achievement_id=achievement.id) }}"></form>
+</section>
+{% endblock %}
