@@ -607,11 +607,22 @@ input, select {
   padding: 18px;
   border-radius: 16px;
   border: 1px dashed var(--stroke);
+  position: relative;
+  overflow: hidden;
 }
 
 .badge.earned {
   border-color: var(--accent);
   background: rgba(45, 125, 70, 0.08);
+}
+
+.badge-ribbon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
 }
 
 .tag {
