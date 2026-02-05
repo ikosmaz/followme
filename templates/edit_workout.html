@@ -2,7 +2,7 @@
 {% set title = "Rediger økt" %}
 {% block content %}
 <section class="card">
-  <h2>Rediger økt</h2>
+  <h2>Rediger treningsøkt</h2>
   <form method="post" class="form">
     <label>Dato
       <input type="date" name="workout_date" value="{{ workout.workout_date }}" required>
@@ -22,8 +22,8 @@
     </label>
     <div class="form-actions">
       <button class="button" type="submit">Lagre endringer</button>
-      <button class="button secondary" type="submit" form="delete-workout">Slett økt</button>
-      <a class="button secondary" href="{{ url_for('workouts') }}">Avbryt</a>
+      <button class="button secondary" type="submit" form="delete-workout">Slett treningsøkt</button>
+      <a class="button secondary small" href="{{ url_for('workouts') }}">Avbryt</a>
     </div>
   </form>
   <form id="delete-workout" method="post" action="{{ url_for('delete_workout', workout_id=workout.id) }}"></form>
