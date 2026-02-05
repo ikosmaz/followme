@@ -740,14 +740,20 @@ def challenges():
     member_ids = {
         cm.challenge_id for cm in ChallengeMember.query.filter_by(user_id=user.id).all()
     }
-    rows = []
+    active_rows = []
+    history_rows = []
     for ch in challenges:
-        if today < ch.start_date:
-            status = "upcoming"
-        elif today > ch.end_date:
-            status = "ended"
-        else:
-            status = "active"
+        if today > ch.end_date:
+            progress_km = sum_km_between(user.id, ch.start_date, ch.end_date, ch.activity_type)
+            history_rows.append(
+                {
+                    "challenge": ch,
+                    "progress_km": progress_km,
+                }
+            )
+            continue
+
+        status = "upcoming" if today < ch.start_date else "active"
         joined = ch.id in member_ids
         progress_km = (
             sum_km_between(user.id, ch.start_date, ch.end_date, ch.activity_type)
@@ -755,7 +761,7 @@ def challenges():
             else 0.0
         )
         percent = min(100, int((progress_km / ch.target_km) * 100)) if ch.target_km > 0 else 0
-        rows.append(
+        active_rows.append(
             {
                 "challenge": ch,
                 "status": status,
@@ -764,7 +770,12 @@ def challenges():
                 "percent": percent,
             }
         )
-    return render_template("challenges.html", user=user, challenges=rows)
+    return render_template(
+        "challenges.html",
+        user=user,
+        challenges=active_rows,
+        history=history_rows,
+    )
 
 
 @app.route("/challenges/<int:challenge_id>/join", methods=["POST"])
