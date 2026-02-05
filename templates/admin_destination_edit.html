@@ -22,7 +22,7 @@
     <div class="form-actions">
       <button class="button" type="submit">Lagre</button>
       <button class="button secondary" type="submit" form="delete-destination">Slett</button>
-      <a class="button secondary" href="{{ url_for('admin_destinations') }}">Avbryt</a>
+      <a class="button secondary small" href="{{ url_for('admin_destinations') }}">Avbryt</a>
     </div>
   </form>
   <form id="delete-destination" method="post" action="{{ url_for('admin_destination_delete', dest_id=destination.id) }}"></form>
