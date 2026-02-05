@@ -4,7 +4,7 @@
 <section class="card">
   <div class="card-header">
     <h2>Rettigheter</h2>
-    <a class="button secondary" href="{{ url_for('admin_users') }}">Tilbake til brukere</a>
+    <a class="button secondary" href="{{ url_for('admin_dashboard') }}">Tilbake til dashboard</a>
   </div>
   <form method="post" class="form">
     <label>Kode
@@ -32,7 +32,7 @@
         <tr>
           <td>{{ p.code }}</td>
           <td>{{ p.description }}</td>
-          <td><a class="button secondary small" href="{{ url_for('admin_permission_edit', permission_id=p.id) }}">Redigere</a></td>
+          <td><a class="button secondary small" href="{{ url_for('admin_permission_edit', permission_id=p.id) }}">Oppdater</a></td>
         </tr>
       {% else %}
         <tr>
