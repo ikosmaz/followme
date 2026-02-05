@@ -45,6 +45,15 @@ body {
   font-weight: 700;
 }
 
+.brand-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.brand-link:hover {
+  color: inherit;
+}
+
 .nav {
   display: flex;
   gap: 16px;
