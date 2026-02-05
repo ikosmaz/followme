@@ -35,8 +35,39 @@
     </div>
   {% else %}
     <div class="card">
-      <p class="muted">Ingen challenges ennå.</p>
+      <p class="muted">Ingen aktive challenges.</p>
     </div>
   {% endfor %}
+</section>
+
+<section class="card">
+  <h2>Historikk</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Navn</th>
+        <th>Periode</th>
+        <th>Mål</th>
+        <th>Type</th>
+        <th>Dine km</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in history %}
+        {% set ch = row.challenge %}
+        <tr>
+          <td>{{ ch.name }}</td>
+          <td>{{ ch.start_date.strftime('%d.%m.%Y') }} – {{ ch.end_date.strftime('%d.%m.%Y') }}</td>
+          <td>{{ "%.1f"|format(ch.target_km) }} km</td>
+          <td>{{ ch.activity_type or "Alle" }}</td>
+          <td>{{ "%.1f"|format(row.progress_km) }}</td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="5" class="muted">Ingen avsluttede challenges enda.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </section>
 {% endblock %}
