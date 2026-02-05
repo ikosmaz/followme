@@ -6,6 +6,9 @@
   <div class="grid-2">
     {% for achievement in achievements %}
       <div class="badge {{ 'earned' if achievement.id in earned_ids else 'locked' }}">
+        {% if achievement.id in earned_ids %}
+          <img class="badge-ribbon" src="{{ url_for('static', filename='img/ribbon.jpg') }}" alt="Ribbon">
+        {% endif %}
         <h3>{{ achievement.name }}</h3>
         <p>{{ achievement.description }}</p>
         {% if achievement.id in earned_ids %}
