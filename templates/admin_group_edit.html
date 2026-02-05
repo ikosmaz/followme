@@ -23,7 +23,7 @@
     <div class="form-actions">
       <button class="button" type="submit">Lagre</button>
       <button class="button secondary" type="submit" form="delete-group">Slett gruppe</button>
-      <a class="button secondary" href="{{ url_for('admin_groups') }}">Avbryt</a>
+      <a class="button secondary small" href="{{ url_for('admin_groups') }}">Avbryt</a>
     </div>
   </form>
   <form id="delete-group" method="post" action="{{ url_for('admin_group_delete', group_id=group.id) }}"></form>
