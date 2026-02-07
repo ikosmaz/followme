@@ -295,6 +295,13 @@ def seed_data():
                     rule_type="workouts",
                     threshold=5,
                 ),
+                Achievement(
+                    code="workout_25",
+                    name="25 økter",
+                    description="Fullfør 25 treningsøkter.",
+                    rule_typr="workouts",
+                    threshhold="25",
+                ),
             ]
         )
 
